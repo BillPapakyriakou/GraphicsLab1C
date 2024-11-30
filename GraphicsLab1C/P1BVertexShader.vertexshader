@@ -1,0 +1,43 @@
+#version 330 core
+
+// Input vertex data, different for all executions of this shader
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 1) in vec4 vertexColor;  // color data
+layout(location = 2) in vec2 vertexUV;     // uv data
+layout(location = 3) in vec3 vertexNormal; // normal data
+
+// Output data ; will be interpolated for each fragment
+
+out vec4 fragmentColor;
+out vec2 UV;
+out vec3 FragPos;  // position in world space
+out vec3 Normal;   // output to fragment shader
+
+
+// Matrices for transformations
+
+uniform mat4 MVP;          // Camera MVP for scene objects
+uniform mat4 lightMVP;      // MVP for light cube or other objects
+uniform mat4 model;        // Model Matrix
+uniform mat4 modelLight;   // Model Matrix for light source
+uniform mat4 view;         // View matrix
+uniform mat3 normalMatrix; // Normal matrix 
+
+uniform bool isLightObject; // Whether the object being drawn is the light cube
+
+
+void main(){
+	
+	gl_Position =  (isLightObject ? lightMVP : MVP) * vec4(vertexPosition_modelspace, 1.0);
+	FragPos = vec3(model * vec4(vertexPosition_modelspace, 1));
+
+
+	Normal = normalize(normalMatrix * vertexNormal);  // Transform normal by normal matrix
+
+
+	// Pass uv and vertex color to fragment shader
+	fragmentColor = vertexColor;
+	UV = vertexUV;
+	
+}
+
